@@ -1,61 +1,135 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Website Đặt Vé Xem Phim
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 1. Giới thiệu
 
-## About Laravel
+Đây là project **website đặt vé xem phim** được xây dựng bằng **Laravel (PHP)**.  
+Website có hai vai trò người dùng:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Admin**: quản lý phim, thể loại, phòng chiếu, ghế, suất chiếu.
+- **User**: đặt vé, xem lịch sử vé.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Phiên bản hiện tại là **phiên bản đơn giản**, có thể mở rộng thêm: upload hình ảnh, AJAX, API ngoài, responsive mobile.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 2. Chức năng chính
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Admin
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- Quản lý phim: thêm, sửa, xóa, hiển thị.
+- Quản lý thể loại phim.
+- Quản lý phòng chiếu, ghế ngồi.
+- Quản lý suất chiếu.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### User
 
-## Laravel Sponsors
+- Đăng ký, đăng nhập.
+- Cập nhật thông tin cá nhân.
+- Xem danh sách phim.
+- Đặt vé và lưu lịch sử đặt vé.
+- Xem đánh giá phim và bình luận.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## 3. Cấu trúc database
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Bảng chính:
 
-## Contributing
+| Bảng            | Mô tả                                |
+| --------------- | ------------------------------------ |
+| `nguoi_dung`    | Thông tin người dùng (admin / khách) |
+| `phim`          | Thông tin phim                       |
+| `the_loai`      | Danh sách thể loại                   |
+| `phim_the_loai` | Liên kết N-N phim và thể loại        |
+| `phong_chieu`   | Thông tin phòng chiếu                |
+| `ghe_ngoi`      | Thông tin ghế trong phòng chiếu      |
+| `suat_chieu`    | Suất chiếu phim                      |
+| `ve`            | Vé người dùng đặt                    |
+| `chi_tiet_ve`   | Ghế trong vé (chi tiết)              |
+| `danh_gia_phim` | Đánh giá và bình luận phim           |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+> Project sử dụng **MySQL** với file SQL sẵn có (`database.sql`).
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 4. Cấu hình project
 
-## Security Vulnerabilities
+1. Clone repo về local:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+git clone https://github.com/USERNAME/website-dat-ve-phim.git
+cd website-dat-ve-phim
+```
 
-## License
+2. Cài dependencies Laravel:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+composer install
+```
+
+3. Copy file `.env.example` → `.env` và chỉnh thông tin database:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=db_dat_ve_phim
+DB_USERNAME=root
+DB_PASSWORD=123
+```
+
+4. Import database:
+
+- Mở **phpMyAdmin / MySQL Workbench**, import file `db_dat_ve_phim.sql` vào MySQL.
+
+5. Chạy project:
+
+```bash
+php artisan serve
+```
+
+- Mở trình duyệt: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+
+---
+
+## 5. Route & Controller
+
+- Project sử dụng **MVC của Laravel**: Models, Controllers, Views.
+- Route được định nghĩa trong `routes/web.php`.
+- Controller xử lý logic chính:
+  - `NguoiDungController` → người dùng
+  - `PhimController` → phim
+  - `SuatChieuController` → suất chiếu
+  - `VeController` → vé
+  - `TheLoaiController` → thể loại
+  - `PhimTheLoaiController` → liên kết phim-thể loại
+  - `PhongChieuController` → phòng chiếu
+  - `GheNgoiController` → ghế
+  - `ChiTietVeController` → chi tiết vé
+  - `DanhGiaPhimController` → đánh giá phim
+
+---
+
+## 6. Chú ý
+
+- Không push file `.env` lên GitHub (bảo mật thông tin database).
+- Dùng `.env.example` để các thành viên cấu hình local.
+- Các thành viên clone về chỉ cần import database SQL và chỉnh `.env` là chạy được project.
+
+---
+
+## 7. Thành viên nhóm
+
+| Họ tên | Công việc                                                            |
+| ------ | -------------------------------------------------------------------- |
+| Thịnh  | Đăng ký/đăng nhập, phân quyền, đổi mật khẩu, hiển thị danh sách phim |
+| Tài    | Quản lý phim, thể loại, phòng chiếu, ghế, suất chiếu (Admin)         |
+| Tiến   | Đặt vé, thanh toán, lịch sử vé                                       |
+| Tùng   | Vẽ sơ đồ use case, ERD, hoạt động, mô tả cấu trúc bảng               |
+
+---
+
+## 8. Ghi chú thêm
+
+- Project có thể mở rộng: upload hình ảnh, AJAX cho giỏ hàng, tìm kiếm, bình luận, tích hợp API bên ngoài (Google Maps, OpenWeather), responsive mobile.
+- Database đã có dữ liệu mẫu, không cần migration hay seeder.
