@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Ve extends Model
+class VeTamThoi extends Model
 {
-    protected $table = 've';
+    protected $table = 've_tam_thoi';
     protected $primaryKey = 've_id';
     public $timestamps = false;
     public $incrementing = false;
@@ -19,9 +19,4 @@ class Ve extends Model
         'thoi_gian_dat',
         'tong_tien'
     ];
-
-    public function chiTietVe()
-    {
-        return $this->hasMany(ChiTietVe::class, 've_id', 've_id');
-    }
 }

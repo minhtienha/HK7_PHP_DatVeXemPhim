@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ChiTietVe extends Model
+class ChiTietVeTamThoi extends Model
 {
-    protected $table = 'chi_tiet_ve';
+    protected $table = 'chi_tiet_ve_tam_thoi';
     public $incrementing = false;
     public $timestamps = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
         've_id',

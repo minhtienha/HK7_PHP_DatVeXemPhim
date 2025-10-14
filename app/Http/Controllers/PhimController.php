@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Phim;
+use App\Models\SuatChieu;
+use App\Models\Ve;
 use Illuminate\Http\Request;
 
 class PhimController extends Controller
@@ -10,12 +12,12 @@ class PhimController extends Controller
     public function index()
     {
         $phims = Phim::all();
-        return view('phim.index', compact('phims'));
+        return view('pages.index', compact('phims'));
     }
 
-    public function show($id)
+    public function show($phim_id)
     {
-        $phim = Phim::find($id);
-        return view('phim.show', compact('phim'));
+        $phim = Phim::with(['danhGia.nguoiDung', 'suatChieu.phongChieu', 'theLoai'])->find($phim_id);
+        return view('pages.detail', compact('phim'));
     }
 }

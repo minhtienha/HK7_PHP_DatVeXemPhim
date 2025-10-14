@@ -9,6 +9,8 @@ class GheNgoi extends Model
     protected $table = 'ghe_ngoi';
     protected $primaryKey = 'ghe_id';
     public $timestamps = false;
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
         'phong_id',

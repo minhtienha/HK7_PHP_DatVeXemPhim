@@ -9,6 +9,8 @@ class NguoiDung extends Model
     protected $table = 'nguoi_dung';
     protected $primaryKey = 'nguoi_dung_id';
     public $timestamps = false;
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
         'ho_ten',
