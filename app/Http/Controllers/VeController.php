@@ -41,6 +41,7 @@ class VeController extends Controller
 
     public function LuuVeTamThoi(Request $request)
     {
+        // Session::forget('ve_id');
         $request->validate([
             'suat_chieu_id' => 'required|exists:suat_chieu,suat_chieu_id',
             'ghe_ids' => 'required|array|min:1',
@@ -68,6 +69,8 @@ class VeController extends Controller
             ]);
         }
 
+        Session::put('ve_id', $veId);
+
         return redirect()->route('chi_tiet_ve_tam_thoi', ['ve_id' => $veId]);
     }
 
@@ -79,41 +82,80 @@ class VeController extends Controller
         return view('pages.bookingDetail', compact('ve_tam_thoi', 'danh_sach_ghe_tam'));
     }
 
-    public function TaoVe_ChiTietVe(Request $request)
+    public function TaoVe_ChiTietVe()
     {
+        // $ve_id = Session::get('ve_id');
+
+        // $ve_tam_thoi = VeTamThoi::where('ve_id', $ve_id)->first();
+        // $danh_sach_ghe_tam = ChiTietVeTamThoi::where('ve_id', $ve_id)->get();
+
+        // if ($ve_tam_thoi) {
+        //     Ve::create([
+        //         've_id' => $ve_tam_thoi->ve_id,
+        //         'nguoi_dung_id' => $ve_tam_thoi->nguoi_dung_id,
+        //         'suat_chieu_id' => $ve_tam_thoi->suat_chieu_id,
+        //         'thoi_gian_dat' => $ve_tam_thoi->thoi_gian_dat,
+        //         'tong_tien' => $ve_tam_thoi->tong_tien,
+        //     ]);
+
+        //     foreach ($danh_sach_ghe_tam as $chiTiet) {
+        //         ChiTietVe::create([
+        //             've_id' => $chiTiet->ve_id,
+        //             'ghe_id' => $chiTiet->ghe_id,
+        //         ]);
+        //     }
+
+        //     $ve_tam_thoi->delete();
+        //     ChiTietVeTamThoi::where('ve_id', $ve_id)->delete();
+        // }
+    }
+
+    public function xuLySauThanhToan(Request $request)
+    {
+        // Lấy tất cả dữ liệu MoMo trả về
         $data = $request->all();
 
-        if ($data['resultCode'] == 0) {
-            $extraData = json_decode(base64_decode($data['extraData']), true);
-            $ve_id = $extraData['ve_id'];
+        // Kiểm tra mã kết quả thanh toán
+        if (isset($data['resultCode']) && $data['resultCode'] == 0) {
+            // ✅ Thành công
+            // Lấy ve_id từ session (nếu bạn lưu khi tạo thanh toán)
+            $veId = session('ve_id');
 
-            $ve_tam_thoi = VeTamThoi::where('ve_id', $ve_id)->first();
-            $danh_sach_ghe_tam = ChiTietVeTamThoi::where('ve_id', $ve_id)->get();
-
-            if ($ve_tam_thoi) {
-                Ve::create([
-                    've_id' => $ve_tam_thoi->ve_id,
-                    'nguoi_dung_id' => $ve_tam_thoi->nguoi_dung_id,
-                    'suat_chieu_id' => $ve_tam_thoi->suat_chieu_id,
-                    'thoi_gian_dat' => $ve_tam_thoi->thoi_gian_dat,
-                    'tong_tien' => $ve_tam_thoi->tong_tien,
-                ]);
-
-                foreach ($danh_sach_ghe_tam as $chiTiet) {
-                    ChiTietVe::create([
-                        've_id' => $chiTiet->ve_id,
-                        'ghe_id' => $chiTiet->ghe_id,
+            if ($veId) {
+                // Tìm dữ liệu tạm trong DB
+                $veTam = VeTamThoi::find($veId);
+                $suatChieuId = $veTam->suat_chieu_id;
+                $tongTien = $veTam->tong_tien;
+                if ($veTam) {
+                    // Tạo vé chính thức
+                    Ve::create([
+                        've_id' => $veId,
+                        'nguoi_dung_id' => 'nd002',
+                        'suat_chieu_id' => $suatChieuId,
+                        'thoi_gian_dat' => now(),
+                        'tong_tien' => $tongTien,
                     ]);
-                }
 
-                // Xóa dữ liệu tạm
-                $ve_tam_thoi->delete();
-                ChiTietVeTamThoi::where('ve_id', $ve_id)->delete();
+                    // Xóa vé tạm
+                    $veTam->delete();
+
+                    // Xóa session
+                    session()->forget('ve_id');
+                }
             }
+
+            return view('phim.ketqua', [
+                'thanh_cong' => true,
+                'message' => 'Thanh toán thành công!',
+                'data' => $data
+            ]);
+        } else {
+            // ❌ Thất bại hoặc hủy
+            return view('phim.ketqua', [
+                'thanh_cong' => false,
+                'message' => 'Thanh toán thất bại hoặc bị hủy!',
+                'data' => $data
+            ]);
         }
-        return response()->json([
-            'status' => 200,
-            'message' => 'IPN received and processed'
-        ]);
     }
 }

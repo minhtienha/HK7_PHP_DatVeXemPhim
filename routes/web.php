@@ -36,7 +36,12 @@ Route::get('/ve/{id}', [VeController::class, 'show'])->name('ve.show'); // Chi t
 Route::get('/dat_ve/{suat_chieu_id}', [VeController::class, 'HienThiGheChoSC'])->name('pages.booking');
 Route::post('/luu_ve_tam_thoi', [VeController::class, 'LuuVeTamThoi'])->name('luu_ve_tam_thoi');
 Route::get('/chi_tiet_ve_tam_thoi/{ve_id}', [VeController::class, 'ChiTietVeTamThoi'])->name('chi_tiet_ve_tam_thoi');
-Route::post('/tao_ve', [VeController::class, 'TaoVe_ChiTietVe'])->name('tao_ve');
+Route::post('/tao_ve', [VeController::class, 'TaoVe_ChiTietVe'])
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])
+    ->name('tao_ve');
+Route::get('/ketqua', [VeController::class, 'xuLySauThanhToan'])->name('momo.ketqua');
+
+
 
 // ===== THỂ LOẠI =====
 Route::get('/the_loai', [TheLoaiController::class, 'index']); // Danh sách thể loại

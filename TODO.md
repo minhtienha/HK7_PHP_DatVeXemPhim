@@ -16,7 +16,7 @@
 
 ## Steps
 
--   [x] Update ThanhToanController::momo_payment: encode data to extraData, change redirectUrl.
--   [x] Update VeController::TaoVe_ChiTietVe: add logic for GET request to decode extraData and create ticket.
--   [x] Update routes to allow GET and POST for /tao_ve.
--   [ ] Test the flow.
+-   [x] Update ThanhToanController::momo_payment: encode full ve_tam_thoi and danh_sach_ghe_tam data to extraData, change redirectUrl to route('tao_ve').
+-   [x] Update VeController::TaoVe_ChiTietVe: add GET method handling for redirect, decode extraData, create ticket if successful, redirect to /phim.
+-   [x] Update routes/web.php: move /tao_ve out of 'api' middleware, enable both GET and POST for /tao_ve.
+-   [ ] Test the flow: book seats, pay via MoMo, verify redirect and IPN, check ticket creation and redirect to /phim.

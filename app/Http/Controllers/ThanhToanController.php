@@ -71,8 +71,8 @@ class ThanhToanController extends Controller
         $veTamThoi = VeTamThoi::orderBy('thoi_gian_dat', 'desc')->first();
         $amount = $veTamThoi->tong_tien ?? 0;
         $orderId = time() . "";
-        $redirectUrl = "http://127.0.0.1:8000/phim";
-        $ipnUrl = "https://e0dfb7d52bc4.ngrok-free.app/tao_ve";
+        $redirectUrl = "https://b9723d8abcb6.ngrok-free.app/ketqua";
+        $ipnUrl = 'https://b9723d8abcb6.ngrok-free.app/tao_ve';
         $extraData = base64_encode(json_encode(['ve_id' => $veTamThoi->ve_id ?? '']));
 
         $requestId = time() . "";
@@ -98,6 +98,10 @@ class ThanhToanController extends Controller
         );
         $result = $this->execPostRequest($endpoint, json_encode($data));
         $jsonResult = json_decode($result, true);
+
+        if (!$jsonResult || !isset($jsonResult['payUrl'])) {
+            return redirect()->back()->with('error', 'Không thể tạo liên kết thanh toán. Vui lòng thử lại.');
+        }
 
         return redirect()->to($jsonResult['payUrl']);
     }
