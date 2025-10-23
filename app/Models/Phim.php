@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Model;
+use App\Models\TheLoai;
 
 class Phim extends Model
 {
@@ -23,6 +23,11 @@ class Phim extends Model
         'hinh_anh'
     ];
 
+    public function theLoais()
+    {
+        return $this->belongsToMany(TheLoai::class, 'phim_the_loai', 'phim_id', 'the_loai_id');
+    }
+
     public function phimTheLoai()
     {
         return $this->hasMany(PhimTheLoai::class, 'phim_id', 'phim_id');
@@ -36,10 +41,5 @@ class Phim extends Model
     public function suatChieu()
     {
         return $this->hasMany(SuatChieu::class, 'phim_id', 'phim_id');
-    }
-
-    public function theLoai()
-    {
-        return $this->belongsToMany(TheLoai::class, 'phim_the_loai', 'phim_id', 'the_loai_id');
     }
 }
