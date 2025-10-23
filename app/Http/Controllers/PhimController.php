@@ -1,10 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Phim; 
+
+use App\Models\Phim;
 use App\Models\TheLoai;
-
-
+use App\Models\SuatChieu;
+use App\Models\Ve;
 use Illuminate\Http\Request;
 
 class PhimController extends Controller
@@ -15,11 +16,12 @@ class PhimController extends Controller
 
         // Nếu file là resources/views/phim/index.blade.php
         return view('phim.index', compact('phims'));
+       
     }
 
-    public function show($id)
+    public function show($phim_id)
     {
-        $phim = Phim::find($id);
-        return view('phim.show', compact('phim'));
+        $phim = Phim::with(['danhGia.nguoiDung', 'suatChieu.phongChieu', 'theLoai'])->find($phim_id);
+        return view('pages.detail', compact('phim'));
     }
 }

@@ -14,7 +14,7 @@ class NguoiDung extends Authenticatable
     protected $keyType = 'string';
 
     public $timestamps = false; // nếu bạn không dùng created_at/updated_at
-    // Hoặc nếu muốn, map ngay_tao thành created_at bằng mutate (nếu cần)
+
 
     protected $fillable = [
         'nguoi_dung_id', 
