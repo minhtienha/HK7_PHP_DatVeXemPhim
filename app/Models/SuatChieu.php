@@ -13,6 +13,7 @@ class SuatChieu extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
+        'suat_chieu_id',
         'phim_id',
         'phong_id',
         'gia_ve',

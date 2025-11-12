@@ -35,7 +35,7 @@ class AuthController extends Controller
                 'email' => $validatedData['email'],
                 'so_dien_thoai' => $validatedData['so_dien_thoai'],
                 'mat_khau' => Hash::make($validatedData['mat_khau']),
-                'vai_tro' => 'khach_hang',
+                'vai_tro' => 'user', // Sửa từ 'khach_hang' thành 'user'
             ]);
 
             return redirect()->route('login')->with('success', 'Đăng ký thành công!');

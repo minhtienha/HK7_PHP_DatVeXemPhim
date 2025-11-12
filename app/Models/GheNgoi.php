@@ -13,6 +13,7 @@ class GheNgoi extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
+        'ghe_id',
         'phong_id',
         'so_ghe'
     ];

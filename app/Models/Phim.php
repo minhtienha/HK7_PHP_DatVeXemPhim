@@ -13,6 +13,7 @@ class Phim extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'phim_id',
         'ten_phim',
         'mo_ta',
         'dao_dien',
