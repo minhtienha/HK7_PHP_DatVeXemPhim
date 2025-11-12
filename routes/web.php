@@ -92,15 +92,54 @@ Route::middleware(['web'])->group(function () {
 
     // ===== ROUTE BẢO VỆ =====
     Route::middleware(['auth'])->group(function () {
-        Route::get('/admin/dashboard', function () {
-            return 'Trang admin';
-        });
-        Route::get('/user/profile', function () {
-            return 'Trang cá nhân';
-        });
-
         // Hồ sơ người dùng (profile)
         Route::get('/profile', [NguoiDungController::class, 'showProfile'])->name('profile');
         Route::post('/profile', [NguoiDungController::class, 'updateProfile']);
+    });
+
+    // ===== ADMIN ROUTES (YÊU CẦU ĐĂNG NHẬP + VAI TRÒ ADMIN) =====
+    Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+        
+        // Dashboard
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
+        
+        // Quản lý Phim
+        Route::get('/phim', [\App\Http\Controllers\Admin\AdminPhimController::class, 'index'])->name('phim.index');
+        Route::get('/phim/create', [\App\Http\Controllers\Admin\AdminPhimController::class, 'create'])->name('phim.create');
+        Route::post('/phim', [\App\Http\Controllers\Admin\AdminPhimController::class, 'store'])->name('phim.store');
+        Route::get('/phim/{phim_id}/edit', [\App\Http\Controllers\Admin\AdminPhimController::class, 'edit'])->name('phim.edit');
+        Route::put('/phim/{phim_id}', [\App\Http\Controllers\Admin\AdminPhimController::class, 'update'])->name('phim.update');
+        Route::delete('/phim/{phim_id}', [\App\Http\Controllers\Admin\AdminPhimController::class, 'destroy'])->name('phim.destroy');
+        
+        // Quản lý Thể loại
+        Route::get('/theloai', [\App\Http\Controllers\Admin\AdminTheLoaiController::class, 'index'])->name('theloai.index');
+        Route::get('/theloai/create', [\App\Http\Controllers\Admin\AdminTheLoaiController::class, 'create'])->name('theloai.create');
+        Route::post('/theloai', [\App\Http\Controllers\Admin\AdminTheLoaiController::class, 'store'])->name('theloai.store');
+        Route::get('/theloai/{id}/edit', [\App\Http\Controllers\Admin\AdminTheLoaiController::class, 'edit'])->name('theloai.edit');
+        Route::put('/theloai/{id}', [\App\Http\Controllers\Admin\AdminTheLoaiController::class, 'update'])->name('theloai.update');
+        Route::delete('/theloai/{id}', [\App\Http\Controllers\Admin\AdminTheLoaiController::class, 'destroy'])->name('theloai.destroy');
+        
+        // Quản lý Phòng chiếu
+        Route::get('/phongchieu', [\App\Http\Controllers\Admin\AdminPhongChieuController::class, 'index'])->name('phongchieu.index');
+        Route::get('/phongchieu/create', [\App\Http\Controllers\Admin\AdminPhongChieuController::class, 'create'])->name('phongchieu.create');
+        Route::post('/phongchieu', [\App\Http\Controllers\Admin\AdminPhongChieuController::class, 'store'])->name('phongchieu.store');
+        Route::get('/phongchieu/{phong_id}/edit', [\App\Http\Controllers\Admin\AdminPhongChieuController::class, 'edit'])->name('phongchieu.edit');
+        Route::put('/phongchieu/{phong_id}', [\App\Http\Controllers\Admin\AdminPhongChieuController::class, 'update'])->name('phongchieu.update');
+        Route::delete('/phongchieu/{phong_id}', [\App\Http\Controllers\Admin\AdminPhongChieuController::class, 'destroy'])->name('phongchieu.destroy');
+        
+        // Quản lý Ghế ngồi
+        Route::get('/ghengoi', [\App\Http\Controllers\Admin\AdminGheNgoiController::class, 'index'])->name('ghengoi.index');
+        Route::get('/ghengoi/create', [\App\Http\Controllers\Admin\AdminGheNgoiController::class, 'create'])->name('ghengoi.create');
+        Route::post('/ghengoi', [\App\Http\Controllers\Admin\AdminGheNgoiController::class, 'store'])->name('ghengoi.store');
+        Route::post('/ghengoi/auto-generate', [\App\Http\Controllers\Admin\AdminGheNgoiController::class, 'autoGenerate'])->name('ghengoi.autogenerate');
+        Route::delete('/ghengoi/{ghe_id}', [\App\Http\Controllers\Admin\AdminGheNgoiController::class, 'destroy'])->name('ghengoi.destroy');
+        
+        // Quản lý Suất chiếu
+        Route::get('/suatchieu', [\App\Http\Controllers\Admin\AdminSuatChieuController::class, 'index'])->name('suatchieu.index');
+        Route::get('/suatchieu/create', [\App\Http\Controllers\Admin\AdminSuatChieuController::class, 'create'])->name('suatchieu.create');
+        Route::post('/suatchieu', [\App\Http\Controllers\Admin\AdminSuatChieuController::class, 'store'])->name('suatchieu.store');
+        Route::get('/suatchieu/{suat_chieu_id}/edit', [\App\Http\Controllers\Admin\AdminSuatChieuController::class, 'edit'])->name('suatchieu.edit');
+        Route::put('/suatchieu/{suat_chieu_id}', [\App\Http\Controllers\Admin\AdminSuatChieuController::class, 'update'])->name('suatchieu.update');
+        Route::delete('/suatchieu/{suat_chieu_id}', [\App\Http\Controllers\Admin\AdminSuatChieuController::class, 'destroy'])->name('suatchieu.destroy');
     });
 });
