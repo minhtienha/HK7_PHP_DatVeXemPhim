@@ -17,4 +17,14 @@ class GheNgoi extends Model
         'phong_id',
         'so_ghe'
     ];
+
+    public function phongChieu()
+    {
+        return $this->belongsTo(PhongChieu::class, 'phong_id', 'phong_id');
+    }
+
+    public function ve()
+    {
+        return $this->belongsToMany(Ve::class, 'chi_tiet_ve', 'ghe_id', 've_id');
+    }
 }

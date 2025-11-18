@@ -13,9 +13,22 @@ class AdminPhimController extends Controller
     /**
      * Hiển thị danh sách phim
      */
-    public function index()
+    public function index(Request $request)
     {
-        $phims = Phim::with('theLoais')->paginate(10);
+        $query = Phim::with('theLoais');
+
+        // Tìm kiếm theo tên phim
+        if ($request->has('search') && $request->search != '') {
+            $query->where('ten_phim', 'like', '%' . $request->search . '%')
+                ->orWhere('dao_dien', 'like', '%' . $request->search . '%');
+        }
+
+        // Lọc theo trạng thái
+        if ($request->has('trang_thai') && $request->trang_thai != '') {
+            $query->where('trang_thai', $request->trang_thai);
+        }
+
+        $phims = $query->paginate(10)->appends($request->all());
         return view('admin.phim.index', compact('phims'));
     }
 
@@ -48,12 +61,17 @@ class AdminPhimController extends Controller
         // Tạo phim_id tự động (ví dụ: PHIM001, PHIM002...)
         $lastPhim = Phim::orderBy('phim_id', 'desc')->first();
         if ($lastPhim) {
-            $lastNumber = (int) substr($lastPhim->phim_id, 4);
+            // Lấy số cuối cùng bất kể prefix (PHIM001, p001, ...)
+            if (preg_match('/(\d{3})$/', $lastPhim->phim_id, $matches)) {
+                $lastNumber = (int)$matches[1];
+            } else {
+                $lastNumber = 0;
+            }
             $newNumber = $lastNumber + 1;
         } else {
             $newNumber = 1;
         }
-        $phim_id = 'PHIM' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+        $phim_id = 'p' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
 
         // Xử lý upload ảnh
         $imageName = null;
@@ -91,7 +109,7 @@ class AdminPhimController extends Controller
         $phim = Phim::with('theLoais')->findOrFail($phim_id);
         $theLoais = TheLoai::all();
         $selectedTheLoais = $phim->theLoais->pluck('the_loai_id')->toArray();
-        
+
         return view('admin.phim.edit', compact('phim', 'theLoais', 'selectedTheLoais'));
     }
 
@@ -120,7 +138,7 @@ class AdminPhimController extends Controller
             if ($phim->hinh_anh && file_exists(public_path('assets/' . $phim->hinh_anh))) {
                 unlink(public_path('assets/' . $phim->hinh_anh));
             }
-            
+
             $image = $request->file('hinh_anh');
             $imageName = time() . '_' . $phim_id . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('assets'), $imageName);

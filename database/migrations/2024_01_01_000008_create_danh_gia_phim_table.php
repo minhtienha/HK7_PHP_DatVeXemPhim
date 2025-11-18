@@ -12,9 +12,10 @@ return new class extends Migration
             $table->string('danh_gia_id', 20)->primary();
             $table->string('nguoi_dung_id', 20);
             $table->string('phim_id', 20);
-            $table->integer('diem'); // 1-5 or 1-10
+            $table->integer('diem');
             $table->text('binh_luan')->nullable();
-            
+            $table->timestamp('ngay_tao')->useCurrent();
+
             $table->foreign('nguoi_dung_id')->references('nguoi_dung_id')->on('nguoi_dung')->onDelete('cascade');
             $table->foreign('phim_id')->references('phim_id')->on('phim')->onDelete('cascade');
         });

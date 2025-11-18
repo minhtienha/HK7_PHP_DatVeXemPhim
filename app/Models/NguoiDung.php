@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -10,19 +11,29 @@ class NguoiDung extends Authenticatable
 
     protected $table = 'nguoi_dung';
     protected $primaryKey = 'nguoi_dung_id';
-    public $incrementing = false;      // vì khóa là string (nd001) không auto-increment
+    public $incrementing = false;
     protected $keyType = 'string';
 
-    public $timestamps = false; // nếu bạn không dùng created_at/updated_at
-
+    const CREATED_AT = 'ngay_tao';
+    const UPDATED_AT = null;
 
     protected $fillable = [
-        'nguoi_dung_id', 
-        'ho_ten', 'email', 
-        'so_dien_thoai', 
-        'mat_khau', 
+        'nguoi_dung_id',
+        'ho_ten',
+        'email',
+        'so_dien_thoai',
+        'mat_khau',
         'vai_tro'
     ];
+
+    protected $hidden = [
+        'mat_khau',
+    ];
+
+    protected $casts = [
+        'ngay_tao' => 'datetime',
+    ];
+
     public function getAuthIdentifierName()
     {
         return 'email';
@@ -33,15 +44,19 @@ class NguoiDung extends Authenticatable
         return 'mat_khau';
     }
 
-    // nếu muốn khi dùng create(['mat_khau' => 'plain']) tự hash (Laravel 10+ hỗ trợ 'hashed')
-    protected $casts = [
-        // 'mat_khau' => 'hashed',
-    ];
-
-    // nếu cần, override để Auth lấy password đúng cột
-    public function getAuthPassword() 
+    public function getAuthPassword()
     {
         return $this->mat_khau;
     }
 
+    // Relationships
+    public function ve()
+    {
+        return $this->hasMany(Ve::class, 'nguoi_dung_id', 'nguoi_dung_id');
+    }
+
+    public function danhGia()
+    {
+        return $this->hasMany(DanhGiaPhim::class, 'nguoi_dung_id', 'nguoi_dung_id');
+    }
 }

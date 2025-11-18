@@ -16,8 +16,9 @@ return new class extends Migration
             $table->date('ngay_chieu');
             $table->time('gio_bat_dau');
             $table->time('gio_ket_thuc');
-            $table->enum('trang_thai', ['con_cho', 'het_cho', 'huy'])->default('con_cho');
-            
+            $table->enum('trang_thai', ['sap_chieu', 'dang_chieu', 'da_ket_thuc'])->default('sap_chieu');
+            $table->timestamp('ngay_tao')->useCurrent();
+
             $table->foreign('phim_id')->references('phim_id')->on('phim')->onDelete('cascade');
             $table->foreign('phong_id')->references('phong_id')->on('phong_chieu')->onDelete('cascade');
         });

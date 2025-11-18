@@ -22,25 +22,41 @@ class AuthController extends Controller
             'ho_ten' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:100', 'unique:nguoi_dung,email'],
             'so_dien_thoai' => ['required', 'string', 'max:15', 'unique:nguoi_dung,so_dien_thoai'],
-            'mat_khau' => ['required', 'string', 'min:6'],
+            'mat_khau' => ['required', 'string', 'min:6', 'confirmed'],
+        ], [
+            'ho_ten.required' => 'Họ tên không được để trống',
+            'email.required' => 'Email không được để trống',
+            'email.email' => 'Email không đúng định dạng',
+            'email.unique' => 'Email đã được sử dụng',
+            'so_dien_thoai.required' => 'Số điện thoại không được để trống',
+            'so_dien_thoai.unique' => 'Số điện thoại đã được sử dụng',
+            'mat_khau.required' => 'Mật khẩu không được để trống',
+            'mat_khau.min' => 'Mật khẩu phải có ít nhất 6 ký tự',
+            'mat_khau.confirmed' => 'Xác nhận mật khẩu không khớp',
         ]);
 
-        // Sinh ID an toàn
-        $newId = uniqid('nd'); // ví dụ: nd651f5c8a3e0b1
+        // Tạo nguoi_dung_id tự động
+        $lastUser = NguoiDung::orderBy('nguoi_dung_id', 'desc')->first();
+        if ($lastUser) {
+            $lastNumber = (int) substr($lastUser->nguoi_dung_id, 2);
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+        $nguoi_dung_id = 'nd' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
 
         try {
             NguoiDung::create([
-                'nguoi_dung_id' => $newId,
+                'nguoi_dung_id' => $nguoi_dung_id,
                 'ho_ten' => $validatedData['ho_ten'],
                 'email' => $validatedData['email'],
                 'so_dien_thoai' => $validatedData['so_dien_thoai'],
                 'mat_khau' => Hash::make($validatedData['mat_khau']),
-                'vai_tro' => 'user', // Sửa từ 'khach_hang' thành 'user'
+                'vai_tro' => 'khach_hang',
             ]);
 
-            return redirect()->route('login')->with('success', 'Đăng ký thành công!');
+            return redirect()->route('login')->with('success', 'Đăng ký thành công! Vui lòng đăng nhập.');
         } catch (\Illuminate\Database\QueryException $ex) {
-            // Nếu vẫn có lỗi duplicate hoặc khác, trả về với thông báo rõ ràng
             return back()->withInput()->with('error', 'Lỗi lưu dữ liệu: ' . $ex->getMessage());
         }
     }
@@ -56,6 +72,10 @@ class AuthController extends Controller
         $data = $request->validate([
             'email' => ['required', 'email'],
             'mat_khau' => ['required'],
+        ], [
+            'email.required' => 'Email không được để trống',
+            'email.email' => 'Email không đúng định dạng',
+            'mat_khau.required' => 'Mật khẩu không được để trống',
         ]);
 
         // Chuẩn bị credentials (Laravel expects 'password' key)
@@ -68,18 +88,21 @@ class AuthController extends Controller
             if (Auth::attempt($credentials)) {
                 // Regenerate session để tránh session fixation
                 $request->session()->regenerate();
-                // Redirect tới /phim (hoặc dùng intended fallback)
-                return redirect()->intended('/phim');
-                // hoặc bắt buộc về phim: return redirect('/phim');
-                // hoặc bằng tên route: return redirect()->route('phim.index');
+
+                // Kiểm tra vai trò và redirect phù hợp
+                if (Auth::user()->vai_tro === 'admin') {
+                    return redirect()->route('admin.dashboard');
+                }
+
+                return redirect()->intended(route('phim.index'));
             }
 
             // Nếu thất bại
             return back()
-                ->withErrors(['email' => 'Thông tin đăng nhập không hợp lệ.'])
+                ->withErrors(['email' => 'Email hoặc mật khẩu không chính xác.'])
                 ->withInput($request->only('email'));
         } catch (\Exception $e) {
-            Log::error('Login exception: '.$e->getMessage());
+            Log::error('Login exception: ' . $e->getMessage());
             return back()->with('error', 'Lỗi hệ thống: ' . $e->getMessage());
         }
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\VeTamThoi;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ThanhToanController extends Controller
 {
@@ -40,6 +41,8 @@ class ThanhToanController extends Controller
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt(
             $ch,
             CURLOPT_HTTPHEADER,
@@ -48,43 +51,66 @@ class ThanhToanController extends Controller
                 'Content-Length: ' . strlen($data)
             )
         );
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+
         //execute post
         $result = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+
+        if ($curlError) {
+            Log::error('cURL Error:', ['error' => $curlError, 'url' => $url]);
+        }
+
+        Log::info('cURL Response:', ['http_code' => $httpCode, 'result' => $result]);
+
         //close connection
         curl_close($ch);
+
         return $result;
     }
 
     public function momo_payment(Request $request)
     {
-        $endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
+        // Lấy cấu hình Momo từ config
+        $env = config('momo.environment', 'test');
+        $momoConfig = config("momo.{$env}");
 
-        // Xài mặc định của momo
-        $partnerCode = 'MOMOBKUN20180529';
-        $accessKey = 'klm05TvNBzhg7h7j';
-        $secretKey = 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa';
+        $endpoint = $momoConfig['endpoint'];
+        $partnerCode = $momoConfig['partner_code'];
+        $accessKey = $momoConfig['access_key'];
+        $secretKey = $momoConfig['secret_key'];
 
+        // Get base URL (dùng config hoặc biến môi trường để dễ thay đổi)
+        $baseUrl = env('APP_URL', 'http://localhost:8000');
 
         $orderInfo = "Thanh toán qua ATM MoMo";
         $veTamThoi = VeTamThoi::orderBy('thoi_gian_dat', 'desc')->first();
-        $amount = $veTamThoi->tong_tien ?? 0;
+
+        if (!$veTamThoi) {
+            return redirect()->back()->with('error', 'Không tìm thấy thông tin vé. Vui lòng thử lại.');
+        }
+
+        $amount = (int)$veTamThoi->tong_tien ?? 0;
         $orderId = time() . "";
-        $redirectUrl = "https://b9723d8abcb6.ngrok-free.app/ketqua";
-        $ipnUrl = 'https://b9723d8abcb6.ngrok-free.app/tao_ve';
+
+        // URLs với base URL động
+        $redirectUrl = $baseUrl . "/ketqua";
+        $ipnUrl = $baseUrl . "/tao_ve";
         $extraData = base64_encode(json_encode(['ve_id' => $veTamThoi->ve_id ?? '']));
 
         $requestId = time() . "";
         $requestType = "payWithMethod";
-        // $extraData = ($_POST["extraData"] ? $_POST["extraData"] : "");
-        //before sign HMAC SHA256 signature
+
+        // HMAC SHA256 signature
         $rawHash = "accessKey=" . $accessKey . "&amount=" . $amount . "&extraData=" . $extraData . "&ipnUrl=" . $ipnUrl . "&orderId=" . $orderId . "&orderInfo=" . $orderInfo . "&partnerCode=" . $partnerCode . "&redirectUrl=" . $redirectUrl . "&requestId=" . $requestId . "&requestType=" . $requestType;
         $signature = hash_hmac("sha256", $rawHash, $secretKey);
+
         $data = array(
             'partnerCode' => $partnerCode,
-            'partnerName' => "Rạp chiếu 4T",
-            "storeId" => "4T_Cinema",
+            'partnerName' => config('momo.store_name', 'Rạp chiếu 4T'),
+            "storeId" => config('momo.store_id', '4T_Cinema'),
             'requestId' => $requestId,
             'amount' => $amount,
             'orderId' => $orderId,
@@ -96,11 +122,21 @@ class ThanhToanController extends Controller
             'requestType' => $requestType,
             'signature' => $signature
         );
+
         $result = $this->execPostRequest($endpoint, json_encode($data));
         $jsonResult = json_decode($result, true);
 
+        // Debug: Log kết quả (có thể xóa sau)
+        Log::info('Momo Response:', ['result' => $jsonResult, 'raw_result' => $result, 'request_data' => $data]);
+
         if (!$jsonResult || !isset($jsonResult['payUrl'])) {
-            return redirect()->back()->with('error', 'Không thể tạo liên kết thanh toán. Vui lòng thử lại.');
+            $errorMsg = isset($jsonResult['message']) ? $jsonResult['message'] : 'Không thể tạo liên kết thanh toán. Vui lòng thử lại.';
+            Log::error('Momo Payment Error:', [
+                'error' => $errorMsg,
+                'response' => $jsonResult,
+                'raw_result' => $result
+            ]);
+            return redirect()->back()->with('error', $errorMsg);
         }
 
         return redirect()->to($jsonResult['payUrl']);

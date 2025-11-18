@@ -13,14 +13,35 @@ class AdminSuatChieuController extends Controller
     /**
      * Hiển thị danh sách suất chiếu
      */
-    public function index()
+    public function index(Request $request)
     {
-        $suatChieus = SuatChieu::with(['phim', 'phongChieu'])
-            ->orderBy('ngay_chieu', 'desc')
+        $query = SuatChieu::with(['phim', 'phongChieu']);
+
+        // Tìm kiếm theo phim
+        if ($request->has('search') && $request->search != '') {
+            $query->whereHas('phim', function ($q) use ($request) {
+                $q->where('ten_phim', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        // Lọc theo phòng chiếu
+        if ($request->has('phong_id') && $request->phong_id != '') {
+            $query->where('phong_id', $request->phong_id);
+        }
+
+        // Lọc theo ngày chiếu
+        if ($request->has('ngay_chieu') && $request->ngay_chieu != '') {
+            $query->whereDate('ngay_chieu', $request->ngay_chieu);
+        }
+
+        $suatChieus = $query->orderBy('ngay_chieu', 'desc')
             ->orderBy('gio_bat_dau', 'desc')
-            ->paginate(15);
-        
-        return view('admin.suatchieu.index', compact('suatChieus'));
+            ->paginate(15)
+            ->appends($request->all());
+
+        $phongChieus = PhongChieu::all();
+
+        return view('admin.suatchieu.index', compact('suatChieus', 'phongChieus'));
     }
 
     /**
@@ -30,7 +51,7 @@ class AdminSuatChieuController extends Controller
     {
         $phims = Phim::where('trang_thai', '!=', 'ngung_chieu')->get();
         $phongChieus = PhongChieu::all();
-        
+
         return view('admin.suatchieu.create', compact('phims', 'phongChieus'));
     }
 
@@ -46,8 +67,41 @@ class AdminSuatChieuController extends Controller
             'gio_bat_dau' => 'required',
             'gio_ket_thuc' => 'required',
             'gia_ve' => 'required|numeric|min:0',
-            'trang_thai' => 'required|in:con_cho,het_cho,huy',
+            'trang_thai' => 'required|in:sap_chieu,dang_chieu,da_ket_thuc',
+        ], [
+            'phim_id.required' => 'Vui lòng chọn phim',
+            'phim_id.exists' => 'Phim không tồn tại',
+            'phong_id.required' => 'Vui lòng chọn phòng chiếu',
+            'phong_id.exists' => 'Phòng chiếu không tồn tại',
+            'ngay_chieu.required' => 'Vui lòng chọn ngày chiếu',
+            'ngay_chieu.date' => 'Ngày chiếu không hợp lệ',
+            'gio_bat_dau.required' => 'Vui lòng nhập giờ bắt đầu',
+            'gio_ket_thuc.required' => 'Vui lòng nhập giờ kết thúc',
+            'gia_ve.required' => 'Vui lòng nhập giá vé',
+            'gia_ve.numeric' => 'Giá vé phải là số',
+            'gia_ve.min' => 'Giá vé không được âm',
         ]);
+
+        // So sánh giờ bắt đầu và kết thúc (hỗ trợ chiếu qua nửa đêm)
+        $start_time = $request->input('gio_bat_dau'); // Định dạng: "22:30"
+        $end_time = $request->input('gio_ket_thuc');   // Định dạng: "00:30" (qua ngày)
+
+        // Chuyển thành phút để so sánh
+        list($start_h, $start_m) = explode(':', $start_time);
+        list($end_h, $end_m) = explode(':', $end_time);
+
+        $start_minutes = $start_h * 60 + $start_m;
+        $end_minutes = $end_h * 60 + $end_m;
+
+        // Nếu giờ kết thúc nhỏ hơn giờ bắt đầu, cộng 24 giờ (chiếu qua ngày)
+        if ($end_minutes <= $start_minutes) {
+            $end_minutes += 24 * 60;
+        }
+
+        // Nếu khoảng thời gian quá dài (> 24 giờ), báo lỗi
+        if ($end_minutes - $start_minutes > 24 * 60) {
+            return back()->withInput()->withErrors(['gio_ket_thuc' => 'Suất chiếu không được quá 24 giờ']);
+        }
 
         // Tạo suat_chieu_id tự động
         $lastSuat = SuatChieu::orderBy('suat_chieu_id', 'desc')->first();
@@ -57,7 +111,7 @@ class AdminSuatChieuController extends Controller
         } else {
             $newNumber = 1;
         }
-        $suat_chieu_id = 'SC' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+        $suat_chieu_id = 'sc' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
 
         SuatChieu::create([
             'suat_chieu_id' => $suat_chieu_id,
@@ -81,7 +135,7 @@ class AdminSuatChieuController extends Controller
         $suatChieu = SuatChieu::findOrFail($suat_chieu_id);
         $phims = Phim::all();
         $phongChieus = PhongChieu::all();
-        
+
         return view('admin.suatchieu.edit', compact('suatChieu', 'phims', 'phongChieus'));
     }
 
@@ -97,7 +151,7 @@ class AdminSuatChieuController extends Controller
             'gio_bat_dau' => 'required',
             'gio_ket_thuc' => 'required',
             'gia_ve' => 'required|numeric|min:0',
-            'trang_thai' => 'required|in:con_cho,het_cho,huy',
+            'trang_thai' => 'required|in:sap_chieu,dang_chieu,da_ket_thuc',
         ]);
 
         $suatChieu = SuatChieu::findOrFail($suat_chieu_id);

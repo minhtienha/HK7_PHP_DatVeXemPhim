@@ -1,103 +1,135 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng ký tài khoản</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-[#1b1b18] min-h-screen flex items-center justify-center">
-    <div class="bg-[#1e1e1e] p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 class="text-3xl font-bold text-center text-white mb-2">Đăng ký tài khoản</h2>
-        <p class="text-center text-gray-400 mb-6">Tạo tài khoản để trải nghiệm đặt vé xem phim nhanh chóng</p>
+@extends('layouts.app')
 
-        {{-- Flash messages --}}
-        @if(session('success'))
-            <div class="mb-4 p-3 rounded bg-green-600 text-white text-center">
-                {{ session('success') }}
-            </div>
-        @endif
-        @if(session('error'))
-            <div class="mb-4 p-3 rounded bg-red-600 text-white text-center">
-                {{ session('error') }}
-            </div>
-        @endif
+@section('title', 'Đăng Ký Tài Khoản')
 
-        {{-- Validation errors --}}
-        @if($errors->any())
-            <div class="mb-4 p-3 rounded bg-red-600 text-white">
-                <ul class="list-disc pl-5">
-                    @foreach($errors->all() as $err)
-                        <li>{{ $err }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <form action="{{ route('register') }}" method="POST" novalidate>
-            @csrf
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label for="ho_ten" class="block text-sm font-medium text-gray-300 mb-1">Họ và tên</label>
-                    <input type="text" id="ho_ten" name="ho_ten" value="{{ old('ho_ten') }}" required
-                        class="w-full px-4 py-2 bg-[#2d2d2d] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                        placeholder="Nguyễn Văn A">
-                    @error('ho_ten')
-                        <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
-                    @enderror
+@section('content')
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <!-- Register Card -->
+            <div class="card shadow-lg border-0" style="border-radius: 12px; overflow: hidden;">
+                <!-- Card Header Gradient -->
+                <div style="background: linear-gradient(135deg, #c41e3a 0%, #a01630 100%); padding: 30px; text-align: center;">
+                    <h2 class="fw-bold text-white mb-2" style="font-size: 28px;">
+                         Đăng Ký Tài Khoản
+                    </h2>
+                    {{-- <p class="text-white mb-0" style="opacity: 0.9;">Tạo tài khoản để đặt vé xem phim dễ dàng hơn</p> --}}
                 </div>
+                <div class="card-body p-5" style="background: #23272b; color: #fff;">
+                    <!-- Messages -->
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle"></i> {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
 
-                <div>
-                    <label for="so_dien_thoai" class="block text-sm font-medium text-gray-300 mb-1">Số điện thoại</label>
-                    <input type="tel" id="so_dien_thoai" name="so_dien_thoai" value="{{ old('so_dien_thoai') }}" required
-                        pattern="[\d+]{9,15}"
-                        class="w-full px-4 py-2 bg-[#2d2d2d] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                        placeholder="0987654321">
-                    @error('so_dien_thoai')
-                        <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
-                    @enderror
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i> {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    @if($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <ul class="mb-0 ms-2">
+                                @foreach($errors->all() as $err)
+                                    <li>{{ $err }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    <!-- Register Form -->
+                    <form action="{{ route('register') }}" method="POST">
+                        @csrf
+                        <!-- Name & Phone Row -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="ho_ten" class="form-label fw-bold text-white">Họ và tên</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0">
+                                        <i class="bi bi-person" style="color: #c41e3a;"></i>
+                                    </span>
+                                    <input type="text" id="ho_ten" name="ho_ten" class="form-control border-0 @error('ho_ten') is-invalid @enderror" 
+                                           placeholder="Nguyễn Văn A" value="{{ old('ho_ten') }}" required>
+                                </div>
+                                @error('ho_ten')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="so_dien_thoai" class="form-label fw-bold text-white">Số điện thoại</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0">
+                                        <i class="bi bi-telephone" style="color: #c41e3a;"></i>
+                                    </span>
+                                    <input type="tel" id="so_dien_thoai" name="so_dien_thoai" class="form-control border-0 @error('so_dien_thoai') is-invalid @enderror" 
+                                           placeholder="0987654321" value="{{ old('so_dien_thoai') }}" required>
+                                </div>
+                                @error('so_dien_thoai')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                        </div>
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-bold text-white">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0">
+                                    <i class="bi bi-envelope" style="color: #c41e3a;"></i>
+                                </span>
+                                <input type="email" id="email" name="email" class="form-control border-0 @error('email') is-invalid @enderror" 
+                                       placeholder="Nhập email" value="{{ old('email') }}" required>
+                            </div>
+                            @error('email')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <label for="mat_khau" class="form-label fw-bold text-white">Mật khẩu</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0">
+                                    <i class="bi bi-lock" style="color: #c41e3a;"></i>
+                                </span>
+                                <input type="password" id="mat_khau" name="mat_khau" class="form-control border-0 @error('mat_khau') is-invalid @enderror" 
+                                       placeholder="••••••••" minlength="6" required>
+                            </div>
+                            <small class="text-light d-block mt-1">Mật khẩu tối thiểu 6 ký tự</small>
+                            @error('mat_khau')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <!-- Terms -->
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="terms" name="terms" {{ old('terms') ? 'checked' : '' }} required>
+                            <label class="form-check-label text-white" for="terms">
+                                Tôi đồng ý với <a href="#" style="color: #f3a633; text-decoration: none;">điều khoản và dịch vụ</a>
+                            </label>
+                            @error('terms')
+                                <small class="text-danger d-block">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <button type="submit" class="btn w-100 fw-bold py-2" 
+                                style="background: linear-gradient(135deg, #c41e3a 0%, #a01630 100%); color: white; border: none;">
+                            <i class="bi bi-person-plus"></i> Đăng Ký
+                        </button>
+                    </form>
+                    <hr class="my-4" style="border-color: #444;">
+                    <!-- Login Link -->
+                    <p class="text-center text-light mb-0">
+                        Đã có tài khoản? 
+                        <a href="{{ route('login') }}" style="color: #f3a633; font-weight: 600; text-decoration: none;">
+                            Đăng nhập ngay
+                        </a>
+                    </p>
                 </div>
             </div>
-
-            <div class="mb-4">
-                <label for="email" class="block text-sm font-medium text-gray-300 mb-1">Email</label>
-                <input type="email" id="email" name="email" value="{{ old('email') }}" required
-                    class="w-full px-4 py-2 bg-[#2d2d2d] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    placeholder="your@email.com">
-                @error('email')
-                    <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <div class="mb-4">
-                <label for="mat_khau" class="block text-sm font-medium text-gray-300 mb-1">Mật khẩu</label>
-                <input type="password" id="mat_khau" name="mat_khau" required minlength="6"
-                    class="w-full px-4 py-2 bg-[#2d2d2d] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    placeholder="********">
-                @error('mat_khau')
-                    <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
-                @enderror
-                <p class="text-xs text-gray-400 mt-1">Mật khẩu tối thiểu 6 ký tự.</p>
-            </div>
-
-            <div class="flex items-center mb-6">
-                <input type="checkbox" id="terms" name="terms" {{ old('terms') ? 'checked' : '' }}
-                    class="w-4 h-4 text-red-600 bg-[#2d2d2d] border-gray-600 rounded">
-                <label for="terms" class="ml-2 text-sm text-gray-400">Tôi đồng ý với điều khoản và dịch vụ</label>
-                @error('terms')
-                    <p class="mt-1 text-sm text-red-400 ml-6">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <button type="submit"
-                class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                Đăng ký
-            </button>
-        </form>
-
-        <p class="text-center text-sm text-gray-400 mt-4">
-            Đã có tài khoản? <a href="{{ route('login') }}" class="text-red-500 hover:underline">Đăng nhập ngay</a>
-        </p>
+        </div>
     </div>
-</body>
-</html>
+</div>
+@endsection

@@ -1,16 +1,27 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
 use App\Models\TheLoai;
 
 class Phim extends Model
+
 {
+    /**
+     * Lấy trạng thái phim từ cột trang_thai
+     */
+    public function getStatus()
+    {
+        return $this->trang_thai;
+    }
     protected $table = 'phim';
     protected $primaryKey = 'phim_id';
     public $incrementing = false;
     protected $keyType = 'string';
-    public $timestamps = false;
+
+    const CREATED_AT = 'ngay_tao';
+    const UPDATED_AT = null;
 
     protected $fillable = [
         'phim_id',
@@ -22,6 +33,11 @@ class Phim extends Model
         'ngay_cong_chieu',
         'trang_thai',
         'hinh_anh'
+    ];
+
+    protected $casts = [
+        'ngay_cong_chieu' => 'date',
+        'ngay_tao' => 'datetime',
     ];
 
     public function theLoais()

@@ -10,14 +10,15 @@ return new class extends Migration
     {
         Schema::create('phim', function (Blueprint $table) {
             $table->string('phim_id', 20)->primary();
-            $table->string('ten_phim', 200);
+            $table->string('ten_phim', 255);
             $table->text('mo_ta')->nullable();
             $table->string('dao_dien', 100)->nullable();
-            $table->string('dien_vien', 255)->nullable();
-            $table->integer('thoi_luong')->nullable(); // in minutes
+            $table->text('dien_vien')->nullable();
+            $table->integer('thoi_luong')->nullable();
             $table->date('ngay_cong_chieu')->nullable();
-            $table->enum('trang_thai', ['dang_chieu', 'sap_chieu', 'ngung_chieu'])->default('dang_chieu');
+            $table->enum('trang_thai', ['sap_chieu', 'dang_chieu', 'ngung_chieu'])->default('sap_chieu');
             $table->string('hinh_anh', 255)->nullable();
+            $table->timestamp('ngay_tao')->useCurrent();
         });
     }
 

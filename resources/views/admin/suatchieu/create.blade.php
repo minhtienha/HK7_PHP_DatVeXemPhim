@@ -68,9 +68,9 @@
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Trạng thái <span class="text-danger">*</span></label>
                         <select name="trang_thai" class="form-select" required>
-                            <option value="con_cho" {{ old('trang_thai') == 'con_cho' ? 'selected' : '' }}>Còn chỗ</option>
-                            <option value="het_cho" {{ old('trang_thai') == 'het_cho' ? 'selected' : '' }}>Hết chỗ</option>
-                            <option value="huy" {{ old('trang_thai') == 'huy' ? 'selected' : '' }}>Hủy</option>
+                            <option value="sap_chieu" {{ old('trang_thai') == 'sap_chieu' ? 'selected' : '' }}>Sắp chiếu</option>
+                            <option value="dang_chieu" {{ old('trang_thai') == 'dang_chieu' ? 'selected' : '' }}>Đang chiếu</option>
+                            <option value="da_ket_thuc" {{ old('trang_thai') == 'da_ket_thuc' ? 'selected' : '' }}>Đã kết thúc</option>
                         </select>
                     </div>
                 </div>

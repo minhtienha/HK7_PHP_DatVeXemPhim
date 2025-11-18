@@ -12,9 +12,10 @@ return new class extends Migration
             $table->string('nguoi_dung_id', 20)->primary();
             $table->string('ho_ten', 100);
             $table->string('email', 100)->unique();
-            $table->string('so_dien_thoai', 15)->nullable();
+            $table->string('so_dien_thoai', 15)->unique();
             $table->string('mat_khau', 255);
-            $table->enum('vai_tro', ['admin', 'user'])->default('user');
+            $table->enum('vai_tro', ['admin', 'khach_hang'])->default('khach_hang');
+            $table->timestamp('ngay_tao')->useCurrent();
         });
     }
 

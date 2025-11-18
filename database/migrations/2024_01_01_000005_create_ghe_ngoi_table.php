@@ -12,7 +12,8 @@ return new class extends Migration
             $table->string('ghe_id', 20)->primary();
             $table->string('phong_id', 20);
             $table->string('so_ghe', 10);
-            
+
+            $table->unique(['phong_id', 'so_ghe']);
             $table->foreign('phong_id')->references('phong_id')->on('phong_chieu')->onDelete('cascade');
         });
     }

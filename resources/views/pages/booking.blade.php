@@ -5,104 +5,186 @@
 @push('styles')
 <style>
     .seat {
-        width: 30px;
-        height: 30px;
-        margin: 5px;
-        border-radius: 5px;
+        width: 38px;
+        height: 38px;
+        margin: 4px;
+        border-radius: 6px;
         display: inline-flex;
         justify-content: center;
         align-items: center;
-        font-size: 10px;
+        font-size: 11px;
+        font-weight: 600;
         cursor: pointer;
-        border: 1px solid #ccc;
-        background-color: #e9ecef;
-        transition: all 0.2s;
+        border: 2px solid #dee2e6;
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    .seat.available:hover {
-        background-color: #d1e7dd;
+    .seat:hover:not(.taken) {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    .seat.available {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        color: #495057;
     }
     .seat.available.selected {
-        background-color: #0d6efd;
+        background: linear-gradient(135deg, #c41e3a 0%, #a01630 100%);
         color: white;
-        border-color: #0d6efd;
+        border-color: #c41e3a;
+        box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
     }
     .seat.taken {
-        background-color: #dc3545;
-        color: white;
+        background-color: #e9ecef;
+        color: #6c757d;
         cursor: not-allowed;
+        border-color: #dee2e6;
+        opacity: 0.6;
     }
     .screen {
-        width: 80%;
-        height: 20px;
-        background-color: #343a40;
-        margin: 20px auto;
+        width: 85%;
+        height: 30px;
+        background: linear-gradient(90deg, #343a40 0%, #495057 50%, #343a40 100%);
+        margin: 30px auto;
         color: white;
         text-align: center;
-        line-height: 20px;
-        border-radius: 5px;
+        line-height: 30px;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 14px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        border: 3px solid #495057;
+    }
+    .booking-info-card {
+        background: white;
+        border-left: 5px solid #c41e3a;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    .seat-legend {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 20px;
+    }
+    .legend-item {
+        display: inline-flex;
+        align-items: center;
+        margin-right: 20px;
+        margin-bottom: 10px;
+    }
+    .legend-item .seat {
+        margin-right: 8px;
+        cursor: default;
     }
 </style>
 @endpush
 
 @section('content')
     <div class="container my-5">
-        <h2 class="text-center mb-4">Đặt vé xem phim: {{ $suatChieu->phim->ten_phim }}</h2>
-        <div class="card shadow-sm p-4 mb-4">
-            <p><strong>Phòng chiếu:</strong> {{ $suatChieu->phongChieu->ten_phong }}</p>
-            <p><strong>Ngày:</strong> {{ date('d-m-Y', strtotime($suatChieu->ngay_chieu)) }}</p>
-            <p><strong>Giờ:</strong> {{ $suatChieu->gio_bat_dau }}</p>
-            <p><strong>Giá vé:</strong> {{ number_format($suatChieu->gia_ve) }} VNĐ/ghế</p>
-            <p class="text-primary" id="total-price"><strong>Tổng tiền:</strong> 0 VNĐ</p>
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ route('phim.index') }}">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('phim.show', $suatChieu->phim->phim_id) }}">{{ Str::limit($suatChieu->phim->ten_phim, 50) }}</a></li>
+                <li class="breadcrumb-item active">Chọn Ghế</li>
+            </ol>
+        </nav>
+
+        <h1 class="fw-bold mb-4 text-dark">
+            Đặt Vé - {{ $suatChieu->phim->ten_phim }}
+        </h1>
+
+        <!-- Booking Info Card -->
+        <div class="card booking-info-card mb-4 p-4">
+            <div class="row">
+                <div class="col-md-3 border-end pb-3 pb-md-0">
+                    <h6 class="text-muted small">PHÒNG CHIẾU</h6>
+                    <p class="fw-bold text-dark">{{ $suatChieu->phongChieu->ten_phong }}</p>
+                </div>
+                <div class="col-md-3 border-end pb-3 pb-md-0">
+                    <h6 class="text-muted small">NGÀY & GIỜ</h6>
+                    <p class="fw-bold text-dark">{{ date('d/m/Y', strtotime($suatChieu->ngay_chieu)) }} - {{ $suatChieu->gio_bat_dau }}</p>
+                </div>
+                <div class="col-md-3 border-end pb-3 pb-md-0">
+                    <h6 class="text-muted small">GIÁ VÉ</h6>
+                    <p class="fw-bold text-dark">{{ number_format($suatChieu->gia_ve) }} <small>VNĐ</small></p>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="text-muted small">TỔNG TIỀN</h6>
+                    <p class="fw-bold" id="total-price" style="color: #c41e3a; font-size: 18px;">0 VNĐ</p>
+                </div>
+            </div>
         </div>
 
         @if (session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle"></i> {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
         @endif
-        
-        <div class="screen">MÀN HÌNH</div>
 
-            <form action="{{ route('luu_ve_tam_thoi') }}" method="POST">
+        <!-- Screen Display -->
+        <div class="screen">
+            <i class="bi bi-display"></i> MÀN HÌNH
+        </div>
 
-                @csrf
-                <input type="hidden" name="suat_chieu_id" value="{{ $suatChieu->suat_chieu_id }}">
-                <div class="row justify-content-center">
-                    <div class="col-auto">
-                        @foreach($gheTrongPhong->chunk(10) as $rowOfSeats) 
-                        <div class="d-flex justify-content-center mb-2">
+        <!-- Seats Selection Form -->
+        <form action="{{ route('luu_ve_tam_thoi') }}" method="POST">
+            @csrf
+            <input type="hidden" name="suat_chieu_id" value="{{ $suatChieu->suat_chieu_id }}">
+
+            <!-- Seats Grid -->
+            <div class="text-center my-5">
+                <div class="d-inline-block">
+                    @foreach($gheTrongPhong->chunk(10) as $rowOfSeats)
+                        <div class="d-flex justify-content-center mb-1">
                             @foreach($rowOfSeats as $ghe)
                                 @php
                                     $isTaken = in_array($ghe->ghe_id, $gheDaDat);
-
-                                    $statusClass = 'available';
-                                    if ($isTaken) {
-                                        $statusClass = 'taken';
-                                    }
+                                    $statusClass = $isTaken ? 'taken' : 'available';
                                 @endphp
                                 <div class="seat {{ $statusClass }}" 
-                                    data-ghe-id="{{ $ghe->ghe_id }}" 
-                                    data-price="{{ $suatChieu->gia_ve }}">
+                                     data-ghe-id="{{ $ghe->ghe_id }}" 
+                                     data-price="{{ $suatChieu->gia_ve }}"
+                                     @if($isTaken) style="pointer-events: none;" @endif>
                                     {{ $ghe->ghe_id }}
                                 </div>
                                 @if(!$isTaken)
                                     <input type="checkbox" name="ghe_ids[]" value="{{ $ghe->ghe_id }}" class="seat-checkbox" style="display:none;">
                                 @endif
-                                @if ($isTaken)
-                                    
-                                @endif
                             @endforeach
                         </div>
-                        @endforeach
-                    </div>
+                    @endforeach
                 </div>
+            </div>
 
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-success btn-lg" id="book-button" disabled>Đặt vé</button>
+            <!-- Seat Legend -->
+            <div class="seat-legend text-center">
+                <div class="legend-item">
+                    <div class="seat available"></div>
+                    <small><strong>Còn trống</strong></small>
                 </div>
-            
-            <div class="text-center mt-3">
-                <span class="seat taken"></span> Đã bán |
-                <span class="seat available" style="background-color:#e9ecef; border-color:#ccc;"></span> Còn trống |
-                <span class="seat available selected"></span> Đã chọn
+                <div class="legend-item">
+                    <div class="seat available selected"></div>
+                    <small><strong>Đã chọn</strong></small>
+                </div>
+                <div class="legend-item">
+                    <div class="seat taken"></div>
+                    <small><strong>Đã bán</strong></small>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-center mt-5">
+                <button type="submit" class="btn btn-lg fw-bold" id="book-button" 
+                        style="background: linear-gradient(135deg, #c41e3a 0%, #a01630 100%); color: white; border: none; padding: 12px 50px;" 
+                        disabled>
+                    <i class="bi bi-check-circle"></i> Xác Nhận Đặt Vé
+                </button>
+                <a href="{{ route('phim.show', $suatChieu->phim->phim_id) }}" class="btn btn-lg btn-outline-secondary ms-2" style="padding: 12px 50px;">
+                    <i class="bi bi-arrow-left"></i> Quay Lại
+                </a>
             </div>
         </form>
     </div>

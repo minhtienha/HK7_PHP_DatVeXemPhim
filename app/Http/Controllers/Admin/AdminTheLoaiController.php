@@ -11,9 +11,16 @@ class AdminTheLoaiController extends Controller
     /**
      * Hiển thị danh sách thể loại
      */
-    public function index()
+    public function index(Request $request)
     {
-        $theLoais = TheLoai::paginate(15);
+        $query = TheLoai::query();
+
+        // Tìm kiếm theo tên thể loại
+        if ($request->has('search') && $request->search != '') {
+            $query->where('ten_the_loai', 'like', '%' . $request->search . '%');
+        }
+
+        $theLoais = $query->paginate(15)->appends($request->all());
         return view('admin.theloai.index', compact('theLoais'));
     }
 
@@ -34,7 +41,20 @@ class AdminTheLoaiController extends Controller
             'ten_the_loai' => 'required|string|max:100|unique:the_loai,ten_the_loai',
         ]);
 
-        TheLoai::create($validated);
+        // Tạo the_loai_id tự động (ví dụ: tl001, tl002...)
+        $lastTheLoai = TheLoai::orderBy('the_loai_id', 'desc')->first();
+        if ($lastTheLoai) {
+            $lastNumber = (int) substr($lastTheLoai->the_loai_id, 2);
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+        $the_loai_id = 'tl' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+
+        TheLoai::create([
+            'the_loai_id' => $the_loai_id,
+            'ten_the_loai' => $validated['ten_the_loai'],
+        ]);
 
         return redirect()->route('admin.theloai.index')->with('success', 'Thêm thể loại thành công!');
     }

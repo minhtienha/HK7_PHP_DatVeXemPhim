@@ -10,8 +10,9 @@ return new class extends Migration
     {
         Schema::create('phong_chieu', function (Blueprint $table) {
             $table->string('phong_id', 20)->primary();
-            $table->string('ten_phong', 100);
+            $table->string('ten_phong', 50)->unique();
             $table->integer('suc_chua');
+            $table->timestamp('ngay_tao')->useCurrent();
         });
     }
 

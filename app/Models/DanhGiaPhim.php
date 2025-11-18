@@ -8,9 +8,11 @@ class DanhGiaPhim extends Model
 {
     protected $table = 'danh_gia_phim';
     protected $primaryKey = 'danh_gia_id';
-    public $timestamps = false;
     protected $keyType = 'string';
     public $incrementing = false;
+
+    const CREATED_AT = 'ngay_tao';
+    const UPDATED_AT = null;
 
     protected $fillable = [
         'danh_gia_id',
@@ -18,6 +20,10 @@ class DanhGiaPhim extends Model
         'phim_id',
         'diem',
         'binh_luan'
+    ];
+
+    protected $casts = [
+        'ngay_tao' => 'datetime',
     ];
 
     public function phim()

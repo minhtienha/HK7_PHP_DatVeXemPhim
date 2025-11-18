@@ -8,9 +8,11 @@ class SuatChieu extends Model
 {
     protected $table = 'suat_chieu';
     protected $primaryKey = 'suat_chieu_id';
-    public $timestamps = false;
     public $incrementing = false;
     protected $keyType = 'string';
+
+    const CREATED_AT = 'ngay_tao';
+    const UPDATED_AT = null;
 
     protected $fillable = [
         'suat_chieu_id',
@@ -23,6 +25,11 @@ class SuatChieu extends Model
         'trang_thai'
     ];
 
+    protected $casts = [
+        'ngay_chieu' => 'date',
+        'ngay_tao' => 'datetime',
+    ];
+
     public function phim()
     {
         return $this->belongsTo(Phim::class, 'phim_id', 'phim_id');
@@ -31,5 +38,10 @@ class SuatChieu extends Model
     public function phongChieu()
     {
         return $this->belongsTo(PhongChieu::class, 'phong_id', 'phong_id');
+    }
+
+    public function ve()
+    {
+        return $this->hasMany(Ve::class, 'suat_chieu_id', 'suat_chieu_id');
     }
 }
