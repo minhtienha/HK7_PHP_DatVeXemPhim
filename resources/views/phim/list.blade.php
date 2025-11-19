@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Danh Sách Phim - MovieTicket')
+@section('title', 'Danh Sách Phim - T4-Ticket')
 
 @section('content')
 <div class="container my-5">

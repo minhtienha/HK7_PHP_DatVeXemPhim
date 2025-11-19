@@ -24,7 +24,7 @@ class NguoiDungController extends Controller
         $user = NguoiDung::find($id);
         return view('nguoi_dung.show', compact('user'));
     }
-        public function showProfile()
+    public function showProfile()
     {
         // Lấy thông tin của người dùng hiện tại
         $user = Auth::user();
@@ -54,7 +54,7 @@ class NguoiDungController extends Controller
             ],
             'mat_khau_moi' => 'nullable|string|min:6', // Tên field mới cho mật khẩu
         ]);
-        
+
         $user->ho_ten = $request->ho_ten;
         $user->email = $request->email;
         $user->so_dien_thoai = $request->so_dien_thoai;
@@ -67,5 +67,29 @@ class NguoiDungController extends Controller
         $user->save();
 
         return redirect()->route('profile')->with('success', 'Cập nhật thông tin thành công!');
+    }
+
+    // Hiển thị danh sách vé đã đặt của người dùng
+    public function showTickets()
+    {
+        $user = Auth::user();
+        $tickets = $user->ve()
+            ->with(['suatChieu.phim', 'suatChieu.phongChieu', 'gheNgoi'])
+            ->orderBy('thoi_gian_dat', 'desc')
+            ->paginate(10);
+
+        return view('nguoi_dung.tickets', compact('tickets'));
+    }
+
+    // Hiển thị danh sách đánh giá của người dùng
+    public function showReviews()
+    {
+        $user = Auth::user();
+        $reviews = $user->danhGiaPhim()
+            ->with('phim')
+            ->orderBy('ngay_tao', 'desc')
+            ->paginate(10);
+
+        return view('nguoi_dung.reviews', compact('reviews'));
     }
 }

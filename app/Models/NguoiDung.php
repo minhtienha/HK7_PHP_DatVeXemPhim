@@ -59,4 +59,9 @@ class NguoiDung extends Authenticatable
     {
         return $this->hasMany(DanhGiaPhim::class, 'nguoi_dung_id', 'nguoi_dung_id');
     }
+
+    public function danhGiaPhim()
+    {
+        return $this->hasMany(DanhGiaPhim::class, 'nguoi_dung_id', 'nguoi_dung_id');
+    }
 }

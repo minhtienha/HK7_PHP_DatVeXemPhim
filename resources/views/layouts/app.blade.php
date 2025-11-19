@@ -88,7 +88,7 @@
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{{ route('phim.index') }}">
-                <i class="bi bi-film"></i> MovieTicket
+                <i class="bi bi-film"></i> T4-Ticket
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -131,7 +131,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4">
-                    <h5><i class="bi bi-info-circle"></i> Về MovieTicket</h5>
+                    <h5><i class="bi bi-info-circle"></i> Về T4-Ticket</h5>
                     <p class="small">Nền tảng đặt vé phim trực tuyến hàng đầu, cung cấp trải nghiệm xem phim tuyệt vời.</p>
                 </div>
                 <div class="col-md-4 mb-4">
@@ -152,7 +152,7 @@
                 </div>
             </div>
             <hr class="bg-secondary">
-            <p class="text-center small mb-0">&copy; 2025 MovieTicket. All rights reserved.</p>
+            <p class="text-center small mb-0">&copy; 2025 T4-Ticket. All rights reserved.</p>
         </div>
     </footer>
 

@@ -96,6 +96,12 @@ Route::middleware(['web'])->group(function () {
         // Hồ sơ người dùng (profile)
         Route::get('/profile', [NguoiDungController::class, 'showProfile'])->name('profile');
         Route::post('/profile', [NguoiDungController::class, 'updateProfile']);
+
+        // Vé đã đặt
+        Route::get('/profile/tickets', [NguoiDungController::class, 'showTickets'])->name('profile.tickets');
+
+        // Đánh giá đã đánh giá
+        Route::get('/profile/reviews', [NguoiDungController::class, 'showReviews'])->name('profile.reviews');
     });
 
     // ===== ADMIN ROUTES (YÊU CẦU ĐĂNG NHẬP + VAI TRÒ ADMIN) =====
