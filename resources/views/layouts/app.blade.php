@@ -131,8 +131,8 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4">
-                    <h5><i class="bi bi-info-circle"></i> Về T4-Ticket</h5>
-                    <p class="small">Nền tảng đặt vé phim trực tuyến hàng đầu, cung cấp trải nghiệm xem phim tuyệt vời.</p>
+                    <h5><i class="bi bi-info-circle"></i> T4-Ticket</h5>
+                    <p class="small">Nền tảng đặt vé nhanh hơn Crush rep tin nhắn!</p>
                 </div>
                 <div class="col-md-4 mb-4">
                     <h5><i class="bi bi-telephone"></i> Liên hệ</h5>

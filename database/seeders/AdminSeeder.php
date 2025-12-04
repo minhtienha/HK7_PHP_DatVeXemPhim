@@ -23,6 +23,6 @@ class AdminSeeder extends Seeder
             'so_dien_thoai' => '0123456789',
         ]);
 
-        $this->command->info('✅ Đã tạo tài khoản admin: admin@test.com / admin123');
+        $this->command->info('Đã tạo tài khoản admin: admin@test.com / admin123');
     }
 }

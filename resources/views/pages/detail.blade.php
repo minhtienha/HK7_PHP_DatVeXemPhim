@@ -17,7 +17,12 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-4 text-center mb-3 mb-md-0">
-                    <img src="{{ asset('asset/' . $phim->hinh_anh) }}" alt="{{ $phim->ten_phim }}" class="img-fluid rounded shadow-sm" style="max-height: 400px;">
+                    @php
+                        $imagePath = $phim->hinh_anh;
+                        $assetsPath = public_path('assets/' . $imagePath);
+                        $imageUrl = file_exists($assetsPath) ? asset('assets/' . $imagePath) : asset('asset/' . $imagePath);
+                    @endphp
+                    <img src="{{ $imageUrl }}" alt="{{ $phim->ten_phim }}" class="img-fluid rounded shadow-sm" style="max-height: 400px;">
                 </div>
                 <div class="col-md-8">
                     <h1 class="fw-bold mb-3 text-dark">{{ $phim->ten_phim }}</h1>

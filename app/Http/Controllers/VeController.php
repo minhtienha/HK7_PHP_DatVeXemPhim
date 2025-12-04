@@ -60,15 +60,20 @@ class VeController extends Controller
         $suatChieu = SuatChieu::find($suatChieuId);
         $tongTien = count($gheIds) * $suatChieu->gia_ve;
 
-        // Lấy mã vé tiếp theo từ bảng Ve chính (Ve cuối cùng + 1)
-        $lastVe = Ve::orderBy('ve_id', 'desc')->first();
-        $lastVeNum = 0;
-        if ($lastVe) {
-            // Extract number từ ve_id (ví dụ: 've002' -> 2)
-            preg_match('/\d+/', $lastVe->ve_id, $matches);
-            $lastVeNum = (int)$matches[0];
+        // Xóa vé tạm thời cũ của người dùng này (nếu có) để tránh duplicate
+        $veTamCu = VeTamThoi::where('nguoi_dung_id', $user->nguoi_dung_id)->get();
+        foreach ($veTamCu as $veTam) {
+            ChiTietVeTamThoi::where('ve_id', $veTam->ve_id)->delete();
+            $veTam->delete();
         }
-        $veId = 've' . str_pad($lastVeNum + 1, 3, '0', STR_PAD_LEFT);
+
+        // Tạo mã vé unique bằng timestamp + random để tránh conflict khi nhiều user cùng lúc
+        // Format: ve_YYYYMMDDHHMMSS_XXXX (ví dụ: ve_20251204153045_A3F2)
+        do {
+            $veId = 've_' . date('YmdHis') . '_' . strtoupper(substr(uniqid(), -4));
+            // Kiểm tra xem mã vé đã tồn tại chưa (rất hiếm xảy ra)
+            $exists = Ve::where('ve_id', $veId)->exists() || VeTamThoi::where('ve_id', $veId)->exists();
+        } while ($exists);
 
         VeTamThoi::create([
             've_id' => $veId,
@@ -78,9 +83,7 @@ class VeController extends Controller
             'tong_tien' => $tongTien,
         ]);
 
-        // Xóa các ghế cũ nếu có
-        ChiTietVeTamThoi::where('ve_id', $veId)->delete();
-
+        // Tạo chi tiết vé tạm thời
         foreach ($gheIds as $gheId) {
             ChiTietVeTamThoi::create([
                 've_id' => $veId,
@@ -170,7 +173,7 @@ class VeController extends Controller
 
         // Kiểm tra mã kết quả thanh toán
         if (isset($data['resultCode']) && $data['resultCode'] == 0) {
-            // ✅ Thanh toán thành công
+            // Thanh toán thành công
             $veId = session('ve_id');
 
             if (!$veId) {
@@ -222,7 +225,7 @@ class VeController extends Controller
                 'data' => $data
             ]);
         } else {
-            // ❌ Thanh toán thất bại hoặc bị hủy
+            // Thanh toán thất bại hoặc bị hủy
             return view('phim.ketqua', [
                 'thanh_cong' => false,
                 'message' => 'Thanh toán thất bại hoặc bị hủy!',

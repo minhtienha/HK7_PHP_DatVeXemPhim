@@ -13,7 +13,7 @@
                         </div>
                         <h2 class="fw-bold mb-3" style="color: #28a745;">Thanh Toán Thành Công!</h2>
                         <p class="text-muted mb-4" style="font-size: 16px;">
-                            Vé của bạn đã được đặt và xác nhận thành công. Kiểm tra email để nhận chi tiết đặt vé.
+                            Vé của bạn đã được đặt và xác nhận thành công.
                         </p>
 
                         @if(isset($data['orderId']))
@@ -53,10 +53,10 @@
                     </div>
                 </div>
 
-                <!-- Thông tin hỗ trợ -->
+                {{-- <!-- Thông tin hỗ trợ -->
                 <div class="alert alert-info mt-4" style="border-left: 4px solid #0d6efd;">
                     <strong>💡 Gợi ý:</strong> Bạn có thể quản lý vé của mình trong phần "Vé của tôi" hoặc kiểm tra email xác nhận.
-                </div>
+                </div> --}}
             @else
                 <!-- Thất bại -->
                 <div class="card shadow-lg border-0" style="border-top: 4px solid #dc3545;">

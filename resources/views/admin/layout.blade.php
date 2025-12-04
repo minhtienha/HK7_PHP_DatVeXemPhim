@@ -100,11 +100,12 @@
                             <i class="fas fa-clock"></i> Quản lý Suất chiếu
                         </a>
                     </li>
-                    <li class="nav-item mt-4">
+                    {{-- <li class="nav-item mt-4">
                         <a class="nav-link" href="{{ route('phim.index') }}">
                             <i class="fas fa-arrow-left"></i> Về trang chủ
                         </a>
-                    </li>
+                    </li> --}}
+                    
                     <li class="nav-item">
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf

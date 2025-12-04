@@ -36,11 +36,12 @@
         box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
     }
     .seat.taken {
-        background-color: #e9ecef;
-        color: #6c757d;
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        color: #ffffff;
         cursor: not-allowed;
-        border-color: #dee2e6;
-        opacity: 0.6;
+        border-color: #495057;
+        opacity: 0.9;
+        font-weight: bold;
     }
     .screen {
         width: 85%;

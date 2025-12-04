@@ -3,7 +3,12 @@
         <a href="{{ route('phim.show', $phim->phim_id) }}" class="text-decoration-none">
             <div class="card h-100 shadow-sm">
                 <div style="position: relative; overflow: hidden; height: 300px;">
-                    <img src="{{ asset('asset/' . $phim->hinh_anh) }}" alt="{{ $phim->ten_phim }}" 
+                    @php
+                        $imagePath = $phim->hinh_anh;
+                        $assetsPath = public_path('assets/' . $imagePath);
+                        $imageUrl = file_exists($assetsPath) ? asset('assets/' . $imagePath) : asset('asset/' . $imagePath);
+                    @endphp
+                    <img src="{{ $imageUrl }}" alt="{{ $phim->ten_phim }}" 
                          class="card-img-top h-100" style="object-fit: cover;">
                     @php
                         $soDanhGia = $phim->danhGia->count();

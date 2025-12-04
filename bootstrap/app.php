@@ -14,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(replace: [
             \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class => \App\Http\Middleware\VerifyCsrfToken::class,
         ]);
-        
+
         // Đăng ký alias cho admin middleware
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,

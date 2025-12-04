@@ -53,7 +53,9 @@ Route::middleware(['web'])->group(function () {
         ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])
         ->name('tao_ve');
 
-    Route::get('/ketqua', [VeController::class, 'xuLySauThanhToan'])->name('momo.ketqua');
+    Route::get('/ketqua', [VeController::class, 'xuLySauThanhToan'])
+        ->withoutMiddleware(['auth'])
+        ->name('momo.ketqua');
 
     // ===== THỂ LOẠI =====
     Route::get('/the_loai', [TheLoaiController::class, 'index']);
@@ -79,6 +81,7 @@ Route::middleware(['web'])->group(function () {
     Route::get('/danh_gia_phim', [DanhGiaPhimController::class, 'index']); // Danh sách đánh giá
     Route::get('/danh_gia_phim/{id}', [DanhGiaPhimController::class, 'show']); // Chi tiết đánh giá
     Route::post('/danh_gia_phim/{id}', [DanhGiaPhimController::class, 'TaoDanhGia'])->name('danhgiaphim.create');
+    Route::delete('/danh_gia_phim/{id}', [DanhGiaPhimController::class, 'xoaDanhGia'])->name('danhgiaphim.delete');
 
     // ===== THANH TOÁN =====
     Route::post('/phuong_thuc_thanh_toan', [ThanhToanController::class, 'phuongThucThanhToan'])->name('phuong_thuc_thanh_toan');

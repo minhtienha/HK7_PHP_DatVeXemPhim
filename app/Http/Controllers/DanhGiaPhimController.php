@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DanhGiaPhim;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DanhGiaPhimController extends Controller
 {
@@ -45,5 +46,22 @@ class DanhGiaPhimController extends Controller
         }
 
         return redirect()->back()->with('success', 'Đánh giá phim đã được tạo thành công!');
+    }
+
+    public function xoaDanhGia($id)
+    {
+        $danhGia = DanhGiaPhim::find($id);
+
+        if (!$danhGia) {
+            return redirect()->back()->with('error', 'Không tìm thấy đánh giá!');
+        }
+        // Kiểm tra xem người dùng hiện tại có phải là người tạo đánh giá không
+        if ($danhGia->nguoi_dung_id !== Auth::user()->nguoi_dung_id) {
+            return redirect()->back()->with('error', 'Bạn không có quyền xóa đánh giá này!');
+        }
+
+        $danhGia->delete();
+
+        return redirect()->back()->with('success', 'Đã xóa đánh giá thành công!');
     }
 }
